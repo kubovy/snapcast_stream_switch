@@ -2,10 +2,12 @@
 import json
 import logging
 import configparser
+import sys
 from telnetlib import Telnet
 from time import sleep, time
 
 log = logging.getLogger(__name__)
+configfile = '/etc/snapcontrol.conf'
 host = '127.0.0.1'
 port = 1705
 streams_priority = dict()
@@ -16,7 +18,7 @@ def initial_config():
     global host
     global port
     config = configparser.ConfigParser(allow_no_value=True)
-    config.read('/etc/snapcontrol.conf')
+    config.read(configfile)
     if 'snapcast' in config:
         if 'host' in config['snapcast']:
             host = config['snapcast']['host']
@@ -108,6 +110,8 @@ def rpc_handler(rpc_call):
 
 
 if __name__ == "__main__":
+    configfile = sys.argv[1] if len(sys.argv) >= 2 else configfile
+    log.debug(f"config file {configfile}")
     initial_config()
     while True:
         try:
